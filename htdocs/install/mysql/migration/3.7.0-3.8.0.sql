@@ -18,6 +18,14 @@
 -- -- VPGSQL8.2 DELETE FROM llx_usergroup_user      WHERE fk_user      NOT IN (SELECT rowid from llx_user);
 -- -- VMYSQL4.1 DELETE FROM llx_usergroup_user      WHERE fk_usergroup NOT IN (SELECT rowid from llx_usergroup);
 
+
+-- IVORY COST (id country=21)
+insert into llx_c_tva(rowid,fk_pays,taux,recuperableonly,localtax1,localtax1_type,localtax2,localtax2_type,note,active) values (211, 21,  '0','0',0,0,0,0,'IVA Rate 0',1);
+insert into llx_c_tva(rowid,fk_pays,taux,recuperableonly,localtax1,localtax1_type,localtax2,localtax2_type,note,active) values (212, 21,  '18','0',7.5,2,0,0,'IVA standard rate',1);
+-- Taiwan VAT Rates
+insert into llx_c_tva(rowid,fk_pays,taux,recuperableonly,note,active) values ( 2131, 213, '5', '0', 'VAT 5%', 1);
+
+
 -- Loan
 create table llx_loan
 (
@@ -119,9 +127,6 @@ CREATE TABLE llx_printing
 )ENGINE=innodb;
 
 ALTER TABLE llx_product_fournisseur_price ADD COLUMN fk_price_expression integer DEFAULT NULL;
-
--- Taiwan VAT Rates
-insert into llx_c_tva(rowid,fk_pays,taux,recuperableonly,note,active) values ( 2131, 213, '5', '0', 'VAT 5%', 1);
 
 -- Add situation invoices
 ALTER TABLE llx_facture ADD COLUMN situation_cycle_ref smallint;
@@ -581,8 +586,6 @@ alter table llx_facture_fourn_det add fk_unit integer default NULL;
 ALTER TABLE llx_facture_fourn_det ADD CONSTRAINT fk_facture_fourn_det_fk_unit FOREIGN KEY (fk_unit) REFERENCES llx_c_units (rowid);
 
 
-ALTER TABLE llx_user DROP INDEX uk_user_fk_societe;
-ALTER TABLE llx_user ADD INDEX idx_user_fk_societe   (fk_soc);
 
 
 -- Feature request: A page to merge two thirdparties into one #2613
@@ -594,7 +597,18 @@ ALTER TABLE llx_categorie_fournisseur DROP FOREIGN KEY fk_categorie_fournisseur_
 ALTER TABLE llx_categorie_fournisseur CHANGE COLUMN fk_societe fk_soc INTEGER NOT NULL;
 ALTER TABLE llx_categorie_fournisseur ADD CONSTRAINT fk_categorie_fournisseur_fk_soc   FOREIGN KEY (fk_soc) REFERENCES llx_societe (rowid);
 
-ALTER TABLE llx_user CHANGE COLUMN fk_societe fk_soc INTEGER NOT NULL;
-ALTER TABLE llx_societe CHANGE COLUMN fk_societe fk_soc INTEGER NOT NULL;
+ALTER TABLE llx_user DROP INDEX uk_user_fk_societe;
+ALTER TABLE llx_user DROP INDEX idx_user_fk_societe;
+ALTER TABLE llx_user CHANGE COLUMN fk_societe fk_soc INTEGER;
+ALTER TABLE llx_user ADD INDEX idx_user_fk_societe (fk_soc);
+
+ALTER TABLE llx_actioncomm ADD COLUMN email_msgid varchar(256);
+ALTER TABLE llx_actioncomm ADD COLUMN email_from varchar(256);
+ALTER TABLE llx_actioncomm ADD COLUMN email_sender varchar(256);
+ALTER TABLE llx_actioncomm ADD COLUMN email_to varchar(256);
+ALTER TABLE llx_actioncomm ADD COLUMN errors_to varchar(256);
+ALTER TABLE llx_actioncomm ADD COLUMN recurid varchar(128);
+
+ALTER TABLE llx_stcomm ADD COLUMN picto varchar(128);
 
 
